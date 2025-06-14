@@ -4333,7 +4333,7 @@ document.addEventListener('DOMContentLoaded', () => {
             feedbackResult.classList.remove('active');
             feedbackSound.pause();
             feedbackSound.currentTime = 0; // Reseta o som
-        }, 4000); // 2 segundos
+        }, 3000); // 2 segundos
     };
 
     const nextQuestion = () => {
