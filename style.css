@@ -1,0 +1,798 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
+
+:root {
+    --bg-color: #0a0a0a;
+    --text-color: #e0e0e0;
+    --primary-neon: #ff004c; /* Vermelho Neon */
+    --secondary-neon: #00ffff; /* Ciano Neon para contrastes/detalhes */
+    --dark-gray: #1a1a1a;
+    --medium-gray: #333;
+    --border-neon: 1px solid var(--primary-neon);
+    --shadow-neon: 0 0 8px var(--primary-neon);
+    --shadow-secondary-neon: 0 0 8px var(--secondary-neon);
+}
+
+body {
+    font-family: 'Share Tech Mono', monospace;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    overflow-x: hidden; /* Evita scroll horizontal indesejado */
+    position: relative;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23ff004c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>') 12 12, auto; /* Cursor de raio neon */
+}
+
+/* Fundo com imagem */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('fundo.jpg'); /* Substitua pela URL da sua imagem de background */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    opacity: 3.1; /* Transparência para o fundo */
+    z-index: -1;
+    filter: blur(0px) grayscale(50%);
+    transition: opacity 0.5s ease-in-out;
+}
+
+body:hover::before {
+    opacity: 0.15; /* Leve aumento de opacidade no hover */
+}
+
+
+/* Geral para links e botões */
+a {
+    color: var(--secondary-neon);
+    text-decoration: none;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+a:hover {
+    color: var(--primary-neon);
+    text-shadow: var(--shadow-neon);
+}
+
+button {
+    background-color: var(--dark-gray);
+    color: var(--primary-neon);
+    border: var(--border-neon);
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1em;
+    text-transform: uppercase;
+    box-shadow: var(--shadow-neon);
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: var(--primary-neon);
+    color: var(--bg-color);
+    box-shadow: 0 0 15px var(--primary-neon);
+    transform: translateY(-2px);
+}
+
+/* Efeito de partículas (canvas) */
+#particle-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2; /* Abaixo do background e conteúdo */
+    pointer-events: none; /* Permite cliques nos elementos abaixo */
+}
+
+/* Patinho Andando */
+#duck {
+    position: fixed;
+    width: 80px; /* Tamanho do patinho */
+    height: auto;
+    z-index: 1000; /* Acima de tudo */
+    transition: transform 0.5s ease-out; /* Suaviza o movimento */
+    animation: duckWaddle 0.8s infinite alternate;
+}
+
+@keyframes duckWaddle {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(5deg); }
+}
+
+/* Pop-up de Boas-Vindas */
+.popup-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.popup-fullscreen.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup-content {
+    background-color: var(--dark-gray);
+    border: 3px solid var(--primary-neon);
+    padding: 40px 60px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 0 30px var(--primary-neon);
+    animation: popupEnter 0.8s forwards;
+    transform: scale(0.8);
+    opacity: 0;
+}
+
+@keyframes popupEnter {
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.popup-content h1 {
+    color: var(--primary-neon);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5em;
+    margin-bottom: 25px;
+    text-shadow: var(--shadow-neon);
+}
+
+.popup-content button {
+    padding: 15px 30px;
+    font-size: 1.2em;
+}
+
+/* Menu Retrátil Pop-up */
+#menu-toggle-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1500;
+    padding: 1px 2px;
+    font-size: 1.5em;
+}
+
+.menu-popup {
+    position: fixed;
+    top: 0;
+    right: -300px; /* Escondido à direita */
+    width: 280px;
+    height: 100%;
+    background-color: rgba(10, 10, 10, 0.95);
+    border-left: 2px solid var(--secondary-neon);
+    box-shadow: -10px 0 30px rgba(0, 255, 255, 0.3);
+    z-index: 1600;
+    transition: right 0.4s ease-out;
+    display: flex;
+    flex-direction: column;
+    padding-top: 60px;
+    box-sizing: border-box;
+    backdrop-filter: blur(8px);
+}
+
+.menu-popup.active {
+    right: 0;
+}
+
+#close-menu-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: transparent;
+    border: none;
+    color: var(--primary-neon);
+    font-size: 1.8em;
+    cursor: pointer;
+    box-shadow: none;
+    transition: color 0.3s ease;
+}
+
+#close-menu-button:hover {
+    color: var(--secondary-neon);
+    transform: none;
+    box-shadow: none;
+}
+
+.menu-popup nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-popup nav ul li {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.menu-popup nav ul li a {
+    color: var(--text-color);
+    font-size: 1.5em;
+    padding: 10px 20px;
+    display: block;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.menu-popup nav ul li a:hover {
+    background-color: rgba(255, 0, 76, 0.2);
+    color: var(--primary-neon);
+    text-shadow: 0 0 10px var(--primary-neon);
+}
+
+/* Header - Título do Site */
+header {
+    text-align: center;
+    padding: 46px 20px 40px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0));
+    border-bottom: 2px solid rgba(255, 0, 76, 0.3);
+    margin-bottom: 40px;
+}
+
+#site-title-image {
+    max-width: 90%;
+    height: auto;
+    filter: drop-shadow(0 0 90px var(--primary-neon)) brightness(1.2);
+    animation: neonGlow 2s infinite alternate;
+}
+
+@keyframes neonGlow {
+    from { filter: drop-shadow(0 0 10px var(--primary-neon)) brightness(1); }
+    to { filter: drop-shadow(0 0 30px var(--primary-neon)) brightness(1.5); }
+}
+
+main {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.cont99ent-section {
+    background-color: var(--dark-gray);
+    border: var(--border-neon);
+    padding: 40px;
+    margin-bottom: 60px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(255, 0, 76, 0.4);
+    position: relative; /* Para efeitos internos */
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.content-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 30px rgba(255, 0, 76, 0.6);
+}
+
+.content-section::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border: 1px solid var(--secondary-neon);
+    border-radius: 15px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.content-section:hover::before {
+    opacity: 1;
+}
+
+.section-title {
+    color: var(--secondary-neon);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.8em;
+    text-align: center;
+    margin-bottom: 30px;
+    text-shadow: 0 0 15px var(--secondary-neon);
+    border-bottom: 2px dashed rgba(0, 255, 255, 0.3);
+    padding-bottom: 15px;
+}
+
+h3 {
+    color: var(--primary-neon);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8em;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    text-shadow: 0 0 8px rgba(255, 0, 76, 0.5);
+    border-left: 5px solid var(--primary-neon);
+    padding-left: 10px;
+}
+
+p {
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 25px;
+    margin-bottom: 15px;
+}
+
+ul li {
+    margin-bottom: 8px;
+}
+
+.content-image {
+    max-width: 90%;
+    height: auto;
+    display: block;
+    margin: 30px auto;
+    border: 3px solid var(--secondary-neon);
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.content-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.8);
+}
+
+hr {
+    border: none;
+    border-top: 2px dashed rgba(255, 0, 76, 0.4);
+    margin: 80px 0;
+    box-shadow: 0 0 10px rgba(255, 0, 76, 0.4);
+}
+
+/* Tabela Periódica */
+.periodic-table-grid {
+    display: grid;
+    grid-template-columns: repeat(18, 1fr); /* 18 colunas para a tabela periódica */
+    gap: 5px;
+    max-width: 100%;
+    margin: 40px auto;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: var(--border-neon);
+    border-radius: 10px;
+    box-shadow: var(--shadow-neon);
+    overflow-x: auto; /* Para garantir que a tabela seja visível em telas menores */
+}
+
+.element {
+    background-color: var(--medium-gray);
+    border: 1px solid var(--secondary-neon);
+    border-radius: 4px;
+    padding: 5px;
+    text-align: center;
+    font-size: 0.8em;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 50px; /* Garante que os elementos não fiquem muito pequenos */
+    aspect-ratio: 1 / 1; /* Mantém a proporção quadrada */
+    user-select: none;
+}
+
+.element:hover {
+    background-color: rgba(0, 255, 255, 0.3);
+    border-color: var(--primary-neon);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px var(--secondary-neon);
+    z-index: 10; /* Eleva o elemento no hover */
+}
+
+.element .symbol {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--primary-neon);
+    text-shadow: 0 0 5px var(--primary-neon);
+}
+
+.element .number {
+    font-size: 0.7em;
+    color: var(--text-color);
+    position: absolute;
+    top: 2px;
+    left: 2px;
+}
+
+.spacer {
+    visibility: hidden; /* Espaços vazios na tabela */
+}
+
+.col-span-10 {
+    grid-column: span 10;
+}
+.col-span-18 {
+    grid-column: span 18;
+}
+
+/* Cores específicas para grupos de elementos (opcional, mas melhora a didática) */
+/* Exemplo: Alcalinos */
+.element[data-number="3"], .element[data-number="11"], .element[data-number="19"],
+.element[data-number="37"], .element[data-number="55"], .element[data-number="87"] {
+    border-color: #ffcc00; /* Amarelo neon */
+    color: #ffcc00;
+}
+.element[data-number="3"] .symbol, .element[data-number="11"] .symbol, .element[data-number="19"] .symbol,
+.element[data-number="37"] .symbol, .element[data-number="55"] .symbol, .element[data-number="87"] .symbol {
+    color: #ffcc00;
+    text-shadow: 0 0 5px #ffcc00;
+}
+
+/* Metais Alcalino-Terrosos */
+.element[data-number="4"], .element[data-number="12"], .element[data-number="20"],
+.element[data-number="38"], .element[data-number="56"], .element[data-number="88"] {
+    border-color: #00ff00; /* Verde neon */
+    color: #00ff00;
+}
+.element[data-number="4"] .symbol, .element[data-number="12"] .symbol, .element[data-number="20"] .symbol,
+.element[data-number="38"] .symbol, .element[data-number="56"] .symbol, .element[data-number="88"] .symbol {
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+}
+
+/* Gases Nobres */
+.element[data-number="2"], .element[data-number="10"], .element[data-number="18"],
+.element[data-number="36"], .element[data-number="54"], .element[data-number="86"],
+.element[data-number="118"] {
+    border-color: #ff69b4; /* Pink neon */
+    color: #ff69b4;
+}
+.element[data-number="2"] .symbol, .element[data-number="10"] .symbol, .element[data-number="18"] .symbol,
+.element[data-number="36"] .symbol, .element[data-number="54"] .symbol, .element[data-number="86"] .symbol,
+.element[data-number="118"] .symbol {
+    color: #ff69b4;
+    text-shadow: 0 0 5px #ff69b4;
+}
+
+/* Lantanídeos */
+.lanthanide, .lanthanide-marker {
+    background-color: #3e005f; /* Roxo escuro */
+    border-color: #a020f0; /* Roxo neon */
+}
+.lanthanide .symbol, .lanthanide-marker .symbol {
+    color: #a020f0;
+    text-shadow: 0 0 5px #a020f0;
+}
+
+/* Actinídeos */
+.actinide, .actinide-marker {
+    background-color: #5f2000; /* Laranja escuro */
+    border-color: #ff8c00; /* Laranja neon */
+}
+.actinide .symbol, .actinide-marker .symbol {
+    color: #ff8c00;
+    text-shadow: 0 0 5px #ff8c00;
+}
+
+/* Pop-up Detalhes do Elemento */
+.element-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1800;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.element-popup.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.element-popup-content {
+    background-color: var(--dark-gray);
+    border: 3px solid var(--secondary-neon);
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 25px var(--secondary-neon);
+    position: relative;
+    max-width: 500px;
+    width: 90%;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.element-popup.active .element-popup-content {
+    transform: translateY(0);
+}
+
+#close-element-popup {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5em;
+    padding: 5px 10px;
+    background-color: transparent;
+    border: none;
+    color: var(--primary-neon);
+    box-shadow: none;
+}
+
+#close-element-popup:hover {
+    color: var(--secondary-neon);
+    background-color: transparent;
+    transform: none;
+}
+
+#element-name {
+    color: var(--primary-neon);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2em;
+    margin-bottom: 15px;
+    text-shadow: var(--shadow-neon);
+}
+
+#element-symbol, #element-number {
+    font-size: 1.2em;
+    color: var(--text-color);
+}
+
+#element-image {
+    max-width: 80%;
+    height: auto;
+    margin-top: 20px;
+    border: 2px solid var(--secondary-neon);
+    border-radius: 5px;
+    box-shadow: 0 0 10px var(--secondary-neon);
+}
+
+/* Vídeos do YouTube */
+.video-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.video-item {
+    background-color: var(--medium-gray);
+    border: 1px solid var(--primary-neon);
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: var(--shadow-neon);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.video-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px var(--primary-neon);
+}
+
+.video-item h3 {
+    color: var(--secondary-neon);
+    font-size: 1.4em;
+    margin-bottom: 15px;
+    text-shadow: 0 0 5px var(--secondary-neon);
+    border-left: none;
+    padding-left: 0;
+}
+
+.video-item iframe {
+    width: 100%;
+    height: 200px;
+    border: 2px solid var(--secondary-neon);
+    border-radius: 5px;
+    box-shadow: 0 0 10px var(--secondary-neon);
+}
+
+/* Quiz */
+#quiz-container {
+    background-color: var(--medium-gray);
+    border: 2px solid var(--secondary-neon);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px var(--secondary-neon);
+    margin-top: 30px;
+}
+
+#quiz-question {
+    font-size: 1.6em;
+    color: var(--primary-neon);
+    margin-bottom: 25px;
+    text-align: center;
+    text-shadow: var(--shadow-neon);
+}
+
+#quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.quiz-option {
+    background-color: var(--dark-gray);
+    color: var(--text-color);
+    border: 1px solid var(--secondary-neon);
+    padding: 15px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    text-align: left;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.quiz-option:hover {
+    background-color: rgba(0, 255, 255, 0.2);
+    border-color: var(--primary-neon);
+    box-shadow: 0 0 10px var(--secondary-neon);
+}
+
+.quiz-option.selected {
+    background-color: rgba(255, 0, 76, 0.3);
+    border-color: var(--primary-neon);
+    box-shadow: 0 0 15px var(--primary-neon);
+}
+
+.quiz-option.correct {
+    background-color: rgba(0, 255, 0, 0.3); /* Verde para resposta correta */
+    border-color: #0f0;
+    box-shadow: 0 0 15px #0f0;
+}
+
+.quiz-option.wrong {
+    background-color: rgba(255, 0, 0, 0.3); /* Vermelho para resposta errada */
+    border-color: #f00;
+    box-shadow: 0 0 15px #f00;
+}
+
+.quiz-option.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#quiz-cont.rols {
+    display: flex;
+    justify-content: left;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.quiz-button {
+    font-size: 1.1em;
+    padding: 12px 25px;
+}
+
+#quiz-help-button.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+    border-color: #555;
+    color: #888;
+    background-color: #222;
+}
+
+#quiz-score {
+    text-align: center;
+    font-size: 1.4em;
+    color: var(--secondary-neon);
+    margin-top: 30px;
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: var(--shadow-secondary-neon);
+}
+
+/* Feedback de acerto/erro em tela cheia */
+#quiz-result-feedback {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2500;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+#quiz-result-feedback.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+#feedback-image {
+    max-width: 80%;
+    max-height: 80%;
+    border-radius: 15px;
+    box-shadow: 0 0 50px rgba(255, 255, 255, 0.8);
+    animation: feedbackZoom 0.5s forwards;
+}
+
+@keyframes feedbackZoom {
+    from { transform: scale(0.7); opacity: 0.5; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Responsividade Básica */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 2em;
+    }
+
+    h3 {
+        font-size: 1.5em;
+    }
+
+    .menu-popup {
+        width: 100%;
+        right: -100%;
+    }
+
+    #menu-toggle-button {
+        top: 15px;
+        right: 15px;
+        font-size: 1.2em;
+    }
+
+    #close-menu-button {
+        font-size: 1.5em;
+        left: 15px;
+    }
+
+    .periodic-table-grid {
+        grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+        gap: 3px;
+    }
+
+    .element {
+        font-size: 0.7em;
+        min-width: 40px;
+    }
+
+    .element .symbol {
+        font-size: 1.2em;
+    }
+
+    .quiz-option {
+        font-size: 1em;
+        padding: 12px 15px;
+    }
+
+    #quiz-question {
+        font-size: 1.3em;
+    }
+
+    .quiz-button {
+        font-size: 0.9em;
+        padding: 10px 15px;
+    }
+}
